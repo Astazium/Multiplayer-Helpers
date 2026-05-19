@@ -1,5 +1,5 @@
-# SomeTweaksPlugin
-A couple of useful (or not) features for [ClassiCube](https://github.com/ClassiCube/ClassiCube) in one plugin!
+# Multiplayer-Helpers
+A couple of useful (or not) features for [ClassiCube](https://github.com/ClassiCube/ClassiCube) multiplayer in one plugin!
 # Components:
 ## AntiAFK
 Rotates player with specified interval in seconds
@@ -38,9 +38,9 @@ For multiplayer, ArtBuilder provides some customizable parameters and commands t
 | /client ArtBuilder placeInterval [float]                  | How often (in seconds) blocks will be placed                    | 0.08  |
 
 # Setting up for Visual Studio
-1. Open console and clone SomeTweaksPlugin repo: `git clone https://github.com/Astazium/SomeTweaksPlugin.git`
-2. Go to SomeTweaksPlugin directory: `cd SomeTweaksPlugin`
+1. Open console and clone Multiplayer-Helpers repo: `git clone https://github.com/Astazium/Multiplayer-Helpers.git`
+2. Go to Multiplayer-Helpers directory: `cd Multiplayer-Helpers`
 3. Clone ClassiCube repo: `git clone https://github.com/ClassiCube/ClassiCube.git`
 4. Open ClassiCube solution in Visual Studio and create new project in it
 6. Open your project properties and in "Configuration Type" choose "Dynamic Library (.dll)". Don`t forget to change it for all configurations!
-7. Click on project, Add -> Existing Item, go to SomeTweaksPlugin/src directory and select all files
+7. Click on project, Add -> Existing Item, go to Multiplayer-Helpers/src directory and select all files
