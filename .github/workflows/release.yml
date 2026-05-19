@@ -4,67 +4,58 @@ on:
   workflow_dispatch:
   pull_request:
     branches: [ "main" ]
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
 
 jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.runner }}
 
-  windows-x86:
-    runs-on: ubuntu-latest
-  
-    steps:
-      - uses: actions/checkout@v4
-  
-      - name: Clone ClassiCube
-        run: git clone https://github.com/ClassiCube/ClassiCube.git
-  
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-mingw-w64-i686
-  
-      - name: Build
-        run: |
-          i686-w64-mingw32-gcc \
-            -shared -O3 -s \
-            -Isrc \
-            src/*.c \
-            -o SomeTweaksPlugin-win32.dll
-  
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-x86
-          path: SomeTweaksPlugin-win32.dll
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: windows-x86
+            runner: ubuntu-latest
+            cc: i686-w64-mingw32-gcc
+            install: |
+              sudo apt-get update
+              sudo apt-get install -y gcc-mingw-w64-i686
+            output: windows-x86-${{ github.event.repository.name }}.dll
+            cflags: -shared -O3 -s
 
-  windows-x64:
-    runs-on: ubuntu-latest
-  
-    steps:
-      - uses: actions/checkout@v4
-  
-      - name: Clone ClassiCube
-        run: git clone https://github.com/ClassiCube/ClassiCube.git
-  
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-mingw-w64-x86-64
-  
-      - name: Build
-        run: |
-          x86_64-w64-mingw32-gcc \
-            -shared -O3 -s \
-            -Isrc \
-            src/*.c \
-            -o SomeTweaksPlugin-win64.dll
-  
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-x64
-          path: SomeTweaksPlugin-win64.dll
+          - name: windows-x64
+            runner: ubuntu-latest
+            cc: x86_64-w64-mingw32-gcc
+            install: |
+              sudo apt-get update
+              sudo apt-get install -y gcc-mingw-w64-x86-64
+            output: windows-x64-${{ github.event.repository.name }}.dll
+            cflags: -shared -O3 -s
 
-  linux-x86:
-    runs-on: ubuntu-latest
+          - name: linux-x86
+            runner: ubuntu-latest
+            cc: gcc
+            install: |
+              sudo dpkg --add-architecture i386
+              sudo apt-get update
+              sudo apt-get install -y gcc-multilib libc6-dev-i386
+            output: linux-x86-${{ github.event.repository.name }}.so
+            cflags: -m32 -shared -fPIC -O3 -s
+
+          - name: linux-x64
+            runner: ubuntu-latest
+            cc: gcc
+            install: |
+              sudo apt-get update
+              sudo apt-get install -y gcc
+            output: linux-x64-${{ github.event.repository.name }}.so
+            cflags: -m64 -shared -fPIC -O3 -s
 
     steps:
       - uses: actions/checkout@v4
@@ -73,90 +64,76 @@ jobs:
         run: git clone https://github.com/ClassiCube/ClassiCube.git
 
       - name: Install dependencies
-        run: |
-          sudo dpkg --add-architecture i386
-          sudo apt-get update
-          sudo apt-get install -y gcc-multilib libc6-dev-i386
+        run: ${{ matrix.install }}
 
       - name: Build
         run: |
-          gcc \
-            -m32 \
-            -shared -fPIC -O3 -s \
+          ${{ matrix.cc }} \
+            ${{ matrix.cflags }} \
             -Isrc \
             src/*.c \
-            -o SomeTweaksPlugin-linux32.so
+            -o "${{ matrix.output }}"
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: linux-x86
-          path: SomeTweaksPlugin-linux32.so
-
-  linux-x64:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Clone ClassiCube
-        run: git clone https://github.com/ClassiCube/ClassiCube.git
-
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc
-
-      - name: Build
-        run: |
-          gcc \
-            -m64 \
-            -shared -fPIC -O3 -s \
-            -Isrc \
-            src/*.c \
-            -o SomeTweaksPlugin-linux64.so
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: linux-x64
-          path: SomeTweaksPlugin-linux64.so
+          name: ${{ matrix.name }}
+          path: ${{ matrix.output }}
 
   macos:
     runs-on: macos-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: x86_64
+            name: macos-x64
+            output: macos-x64-${{ github.event.repository.name }}.dylib
+
+          - arch: arm64
+            name: macos-arm64
+            output: macos-arm64-${{ github.event.repository.name }}.dylib
+
     steps:
       - uses: actions/checkout@v4
 
       - name: Clone ClassiCube
         run: git clone https://github.com/ClassiCube/ClassiCube.git
 
-      - name: Build x64
+      - name: Build
         run: |
           clang \
             -dynamiclib -O3 \
-            -arch x86_64 \
+            -arch ${{ matrix.arch }} \
             -Isrc \
             src/*.c \
-            -o SomeTweaksPlugin-macos-x64.dylib
+            -o "${{ matrix.output }}"
 
-      - name: Build arm64
-        run: |
-          clang \
-            -dynamiclib -O3 \
-            -arch arm64 \
-            -Isrc \
-            src/*.c \
-            -o SomeTweaksPlugin-macos-arm64.dylib
-
-      - name: Upload x64 artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: macos-x64
-          path: SomeTweaksPlugin-macos-x64.dylib
+          name: ${{ matrix.name }}
+          path: ${{ matrix.output }}
 
-      - name: Upload arm64 artifact
-        uses: actions/upload-artifact@v4
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs:
+      - build
+      - macos
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
         with:
-          name: macos-arm64
-          path: SomeTweaksPlugin-macos-arm64.dylib
+          path: artifacts
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/**/*
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
