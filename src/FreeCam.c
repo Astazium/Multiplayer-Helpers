@@ -122,6 +122,12 @@ static FP_Math_SinF Math_SinF_;
 static FP_Math_CosF Math_CosF_;
 
 static void FreeCam_Init(void) {
+    struct _InputEventsList* InputEvents_;
+    FP_Event_Register Event_Register;
+
+    InputEvents_ = GetGameSymbol(INPUTEVENTS_);
+    Event_Register = GetFP(FP_Event_Register, EVENT_REGISTER_);
+
     GetFP(FP_Commands_Register, COMMANDS_REGISTER_)(&FreeCamCmd);
     PlayerEntity = &TempVar(struct _EntitiesData*, ENTITIES_)->CurPlayer->Base;
     Game_   = GetGameSymbol(GAME_);
@@ -130,9 +136,6 @@ static void FreeCam_Init(void) {
 
     Math_SinF_ = GetFP(FP_Math_SinF, MATH_SINF_);
     Math_CosF_ = GetFP(FP_Math_CosF, MATH_COSF_);
-
-    struct _InputEventsList* InputEvents_ = GetGameSymbol(INPUTEVENTS_);
-    FP_Event_Register Event_Register = GetFP(FP_Event_Register, EVENT_REGISTER_);
 
     Event_Register((void*)&InputEvents_->Down2, NULL, (Event_Void_Callback)OnKeyPressed);
     Event_Register((void*)&InputEvents_->Up2,   NULL, (Event_Void_Callback)OnKeyReleased);

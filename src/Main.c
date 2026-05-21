@@ -21,9 +21,8 @@ static const struct IGameComponent* const comps[] = {
 #define RegisterCompsEvent(callback)    \
 unsigned comp = 0;                      \
 while (comps[comp]) {                   \
-    if (comps[comp]->callback) {        \
+    if (comps[comp]->callback)          \
         comps[comp]->callback();        \
-    }                                   \
     ++comp;                             \
 }
 
