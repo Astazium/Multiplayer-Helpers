@@ -15,13 +15,13 @@
 #include "GameSymbols.h"
 #include "Utils.h"
 
-static void FreeImage(void);
+static void ArtBuilder_Free(void);
 static void ArtBuilder_Init(void);
 static void FreeImage(void);
 
 const struct IGameComponent ArtBuilderComp = {
     ArtBuilder_Init, /* Init */
-    FreeImage, /* Free */
+    ArtBuilder_Free, /* Free */
     FreeImage, /* Reset */
     NULL, /* OnNewMap */
     FreeImage, /* OnNewMapLoaded */
@@ -553,6 +553,11 @@ static void ArtBuilder_MPBuildTask(struct ScheduledTask* task) {
     }
 }
 
+static void ArtBuilder_Free(void) {
+    GetFP(FP_Event_Unregister, EVENT_UNREGISTER_)((struct Event_Void*)&TempVar(struct _TextureEventsList*, TEXTUREEVENTS_)->AtlasChanged, NULL, UpdateAverageBlocksColor);
+    FreeImage();
+}
+
 static void UpdateAverageBlocksColor(void* obj) {
     cc_bool   hasCPE;
     (void)obj;
@@ -577,7 +582,7 @@ static void ArtBuilder_Init(void) {
         MPmode.enabled = false;
     }
 
-    GetFP(FP_Event_Register, EVENT_REGISTER_)((void*)&TempVar(struct _TextureEventsList*, TEXTUREEVENTS_)->AtlasChanged, NULL, UpdateAverageBlocksColor);
+    GetFP(FP_Event_Register,    EVENT_REGISTER_)((struct Event_Void*)&TempVar(struct _TextureEventsList*, TEXTUREEVENTS_)->AtlasChanged, NULL, UpdateAverageBlocksColor);
     GetFP(FP_ScheduledTask_Add, SCHEDULEDTASK_ADD_)(GAME_DEF_TICKS, ArtBuilder_MPBuildTask);
     GetFP(FP_Commands_Register, COMMANDS_REGISTER_)(&BuildImageCmd);
 }
