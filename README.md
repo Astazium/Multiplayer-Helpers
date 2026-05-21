@@ -3,17 +3,17 @@ A couple of useful (or not) features for [ClassiCube](https://github.com/ClassiC
 # Components:
 ## AntiAFK
 Rotates player with specified interval in seconds
-| Command | Description |
-|---------|-------------|
-| /client AntiAFK [true/false] | Turn AntiAFK on/off                 |
-| /client AntiAFK [float]      | Sets rotating interval (in seconds) |
+| Command | Description | Default Value |
+|---------|-------------|---------------|
+| /client AntiAFK [true/false] | Turn AntiAFK on/off                 | false |
+| /client AntiAFK [float]      | Sets rotating interval (in seconds) |  1.0  |
 
 ## FreeCam
 FreeCam. Controls on arrow keys and numpad's 1 to up, 0 to down
-| Command | Description |
-|---------|-------------|
-| /client FreeCam [true/false] | Turn FreeCam on/off |
-| /client FreeCam [float]      | Changes speed       |
+| Command | Description | Default Value |
+|---------|-------------|---------------|
+| /client FreeCam [true/false] | Turn FreeCam on/off | false |
+| /client FreeCam [float]      | Changes speed       | 19.2  |
 
 ## ArtBuilder
 Builds an png image from blocks with specified parameters
