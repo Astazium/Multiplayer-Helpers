@@ -553,18 +553,18 @@ static void ArtBuilder_MPBuildTask(struct ScheduledTask* task) {
     }
 }
 
-static void ArtBuilder_Free(void) {
-    GetFP(FP_Event_Unregister, EVENT_UNREGISTER_)((struct Event_Void*)&TempVar(struct _TextureEventsList*, TEXTUREEVENTS_)->AtlasChanged, NULL, UpdateAverageBlocksColor);
-    FreeImage();
-}
-
 static void UpdateAverageBlocksColor(void* obj) {
-    cc_bool   hasCPE;
+    cc_bool hasCPE;
     (void)obj;
     hasCPE = GetFP(FP_Options_GetBool, OPTIONS_GETBOOL_)(OPT_CPE, true);
     blockCount = hasCPE ? BLOCK_MAX_CPE : BLOCK_MAX_ORIGINAL;
     GetFP(FP_Chat_Add1, CHAT_ADD1_)("&eHas CPE: %t", &hasCPE);
     TakeAverageBlocksColor();
+}
+
+static void ArtBuilder_Free(void) {
+    GetFP(FP_Event_Unregister, EVENT_UNREGISTER_)((struct Event_Void*)&TempVar(struct _TextureEventsList*, TEXTUREEVENTS_)->AtlasChanged, NULL, UpdateAverageBlocksColor);
+    FreeImage();
 }
 
 static void ArtBuilder_Init(void) {

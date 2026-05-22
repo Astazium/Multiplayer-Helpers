@@ -31,10 +31,11 @@ static void FreeCam_Disable(void) {
 }
 
 static void FreeCam_Init(void);
+static void FreeCam_Free(void);
 
 const struct IGameComponent FreeCamComp = {
     FreeCam_Init, /* Init */
-    NULL, /* Free */
+    FreeCam_Free, /* Free */
     FreeCam_Disable, /* Reset */
     FreeCam_Disable, /* OnNewMap */
     NULL, /* OnNewMapLoaded */
@@ -114,6 +115,15 @@ static void OnKeyReleased(void* obj, int key, cc_bool repeating, struct InputDev
     }
 }
 
+static void FreeCam_Free(void) {
+    struct _InputEventsList* InputEvents_;
+    FP_Event_Unregister Event_Unregister;
+    InputEvents_     = GetGameSymbol(INPUTEVENTS_);
+    Event_Unregister = GetFP(FP_Event_Unregister, EVENT_UNREGISTER_);
+    Event_Unregister((struct Event_Void*)&InputEvents_->Down2, NULL, (Event_Void_Callback)OnKeyPressed);
+    Event_Unregister((struct Event_Void*)&InputEvents_->Up2,   NULL, (Event_Void_Callback)OnKeyReleased);
+}
+
 static struct Entity* PlayerEntity;
 static struct _GameData* Game_;
 static Vec3* Camera_CurrentPos;
@@ -125,7 +135,7 @@ static void FreeCam_Init(void) {
     struct _InputEventsList* InputEvents_;
     FP_Event_Register Event_Register;
 
-    InputEvents_ = GetGameSymbol(INPUTEVENTS_);
+    InputEvents_   = GetGameSymbol(INPUTEVENTS_);
     Event_Register = GetFP(FP_Event_Register, EVENT_REGISTER_);
 
     GetFP(FP_Commands_Register, COMMANDS_REGISTER_)(&FreeCamCmd);
@@ -137,8 +147,8 @@ static void FreeCam_Init(void) {
     Math_SinF_ = GetFP(FP_Math_SinF, MATH_SINF_);
     Math_CosF_ = GetFP(FP_Math_CosF, MATH_COSF_);
 
-    Event_Register((void*)&InputEvents_->Down2, NULL, (Event_Void_Callback)OnKeyPressed);
-    Event_Register((void*)&InputEvents_->Up2,   NULL, (Event_Void_Callback)OnKeyReleased);
+    Event_Register((struct Event_Void*)&InputEvents_->Down2, NULL, (Event_Void_Callback)OnKeyPressed);
+    Event_Register((struct Event_Void*)&InputEvents_->Up2,   NULL, (Event_Void_Callback)OnKeyReleased);
 }
 
 static Vec3 FreeCam_GetPosition(float t) {
