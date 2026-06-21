@@ -42,5 +42,5 @@ For multiplayer, ArtBuilder provides some customizable parameters and commands t
 2. Go to Multiplayer-Helpers directory: `cd Multiplayer-Helpers`
 3. Clone ClassiCube repo: `git clone https://github.com/ClassiCube/ClassiCube.git`
 4. Open ClassiCube solution in Visual Studio and create new project in it
-6. Open your project properties and in "Configuration Type" choose "Dynamic Library (.dll)". Don`t forget to change it for all configurations!
+6. Open your project properties and in "Configuration Type" choose "Dynamic Library (.dll)". Don't forget to change it for all configurations!
 7. Click on project, Add -> Existing Item, go to Multiplayer-Helpers/src directory and select all files
