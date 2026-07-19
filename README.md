@@ -1,5 +1,5 @@
 # Multiplayer-Helpers
-A couple of useful (or not) features for [ClassiCube](https://github.com/ClassiCube/ClassiCube) multiplayer in one plugin!
+A couple of useful (or not) features for [ClassiCube](https://github.com/ClassiCube/ClassiCube) multiplayer in one plugin
 # Components:
 ## AntiAFK
 Rotates player with specified interval in seconds
@@ -23,7 +23,7 @@ Builds an png image from blocks with specified parameters
 | /client ArtBuilder [parameter] [value]                              | Sets [parameter] to [value] |
 
 ### Multiplayer mode
-ArtBuilder, like other features from this plugin, fully supports multiplayer!
+ArtBuilder, like other features from this plugin, fully supports multiplayer
 
 For multiplayer, ArtBuilder provides some customizable parameters and commands to control how ArtBuilder would build your image.
 
