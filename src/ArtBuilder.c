@@ -216,7 +216,7 @@ static void FreeImage(void) {
 static struct Entity* PlayerEntity;
 
 static void ArtBuilder_Build(const IVec2* dir);
-static void ShowFSError(const char* contextMsg, cc_result errCode);
+static void Chat_AddFileSystemError(const char* contextMsg, cc_result errCode);
 /* Whether the given coordinates lie inside the map. */
 static cc_bool World_Contains_(const IVec3* pos);
 
@@ -331,7 +331,7 @@ static void ArtBuilderCommand_Execute(const cc_string* args, int argsCount) {
         }
         fileSystemErr = GetFP(FP_Stream_OpenFile, STREAM_OPENFILE_)(&s, &args[1]);
         if (fileSystemErr) {
-            ShowFSError("Could not open the image", fileSystemErr);
+            Chat_AddFileSystemError("&eCould not open the image: ", fileSystemErr);
             return;
         }
         pngDecodeErr = GetFP(FP_Png_Decode, PNG_DECODE_)(&Image.bmp, &s);
@@ -590,36 +590,40 @@ static void ArtBuilder_Init(void) {
 #define NOIME
 #include <windows.h>
 
-static void ShowFSError(const char* contextMsg, cc_result errCode) {
-    LPSTR errMsgBuf = NULL;
-    FP_Window_ShowDialog Window_ShowDialog_ = (FP_Window_ShowDialog)GetGameRawSymbol(WINDOW_SHOWDIALOG_);
-    if (!FormatMessageA(
-        FORMAT_MESSAGE_ALLOCATE_BUFFER |
+static void Chat_AddFileSystemError(const char* contextMsg, cc_result errCode) {
+    cc_string errMsgStr;
+    char errMsgBuffer[512];
+    WCHAR rawErrMsgBuf[512];
+    DWORD length;
+
+    String_InitArray(errMsgStr, errMsgBuffer);
+    GetFP(FP_String_AppendConst, STRING_APPENDCONST_)(&errMsgStr, contextMsg);
+
+    length = FormatMessageW(
         FORMAT_MESSAGE_FROM_SYSTEM |
         FORMAT_MESSAGE_IGNORE_INSERTS,
         NULL,
         errCode,
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-        (LPSTR)&errMsgBuf,
-        0,
-        NULL)) 
-    {
-        cc_string errCodeStr; char errCodeBuf[512];
-        String_InitArray_NT(errCodeStr, errCodeBuf);
-        GetFP(FP_String_Format1, STRING_FORMAT1_)(&errCodeStr, "Error code: %i", &errCode);
-        errCodeStr.buffer[errCodeStr.length] = '\0';
-        Window_ShowDialog_(contextMsg, errCodeStr.buffer);
+        MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US),
+        rawErrMsgBuf,
+        sizeof(rawErrMsgBuf) / sizeof(*rawErrMsgBuf),
+        NULL
+    );
+
+    if (!length) {
+        GetFP(FP_String_Format1, STRING_FORMAT1_)(&errMsgStr, "Error code: %i", &errCode);
+        GetFP(FP_Chat_Add, CHAT_ADD_)(&errMsgStr);
         return;
     }
 
-    Window_ShowDialog_(contextMsg, errMsgBuf);
-    LocalFree(errMsgBuf);
+    GetFP(FP_String_AppendUtf16, STRING_APPENDUTF16_)(&errMsgStr, rawErrMsgBuf, length * sizeof(WCHAR));
+    GetFP(FP_Chat_Add, CHAT_ADD_)(&errMsgStr);
 }
 
 #else
 #define _GNU_SOURCE
 
-static void ShowFSError(const char* contextMsg, cc_result errCode) {
+static void Chat_AddFileSystemError(const char* contextMsg, cc_result errCode) {
     GetFP(FP_Chat_Add2, CHAT_ADD2_)("&e%c: %i", contextMsg, &errCode);
 }
 

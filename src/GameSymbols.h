@@ -14,12 +14,12 @@ struct ScheduledTask2;
 typedef void(*FP_Game_ChangeBlock)(int x, int y, int z, BlockID block);
 typedef cc_bool(*FP_Options_GetBool)(const char* key, cc_bool defValue);
 typedef cc_result(*FP_Png_Decode)(struct Bitmap* bmp, struct Stream* stream);
-typedef void(*FP_Window_ShowDialog)(const char* title, const char* msg);
 /*typedef void(*FP_ScheduledTask2_Add)(struct ScheduledTask2* task);*/
 typedef void(*FP_ScheduledTask_Add)(double interval, ScheduledTaskCallback callback);
 typedef cc_string(*FP_String_FromReadonly)(STRING_REF const char* buffer);
 typedef void(*FP_Mem_Free)(void* mem);
 typedef void(*FP_Process_Exit)(cc_result code);
+typedef void(*FP_String_AppendUtf16)(cc_string* str, const void* data, int numBytes);
 
 /* Events */
 typedef void(*FP_Event_Register)  (struct Event_Void* handlers, void* obj, Event_Void_Callback handler);
@@ -66,6 +66,7 @@ DeclareSymbol(CHAT_ADD3_,			Chat_Add3)							\
 DeclareSymbol(CHAT_ADD4_,			Chat_Add4)							\
 /* Strings */															\
 DeclareSymbol(STRING_APPENDCONST_,  String_AppendConst)					\
+DeclareSymbol(STRING_APPENDUTF16_,  String_AppendUtf16)					\
 DeclareSymbol(STRING_FORMAT1_,		String_Format1)						\
 DeclareSymbol(STRING_FORMAT4_,		String_Format4)						\
 DeclareSymbol(STRING_FORMAT2_,		String_Format2)						\
@@ -87,8 +88,7 @@ DeclareSymbol(OPTIONS_GETBOOL_,		Options_GetBool)					\
 DeclareSymbol(STREAM_OPENFILE_,		Stream_OpenFile)					\
 DeclareSymbol(MEM_FREE_,			Mem_Free)							\
 DeclareSymbol(PNG_DECODE_,			Png_Decode)							\
-DeclareSymbol(PROCESS_EXIT_,		Process_Exit)						\
-DeclareSymbol(WINDOW_SHOWDIALOG_,   Window_ShowDialog)
+DeclareSymbol(PROCESS_EXIT_,		Process_Exit)
 
 #define DeclareSymbol(enumName, symbolName) enumName,
 enum GAMESYMBOL
