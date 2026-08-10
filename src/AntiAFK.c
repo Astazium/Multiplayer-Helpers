@@ -26,7 +26,7 @@ static void AntiAfk_Reset(void) {
         g_Enabled = false;
 }
 
-static void AntiAfk_Execute(const cc_string* args, int argsCount) {
+static void AntiAfkCommand_Execute(const cc_string* args, int argsCount) {
     cc_bool enabled;
     if (argsCount == 0) {
         Chat_AddRaw("&eToo few arguments.");
@@ -65,8 +65,8 @@ static void AntiAfk_Execute(const cc_string* args, int argsCount) {
     }
 }
 
-static struct ChatCommand AntiAfkCmd = {
-    "AntiAFK", AntiAfk_Execute,
+static struct ChatCommand AntiAfkCommand = {
+    "AntiAFK", AntiAfkCommand_Execute,
     COMMAND_FLAG_UNSPLIT_ARGS,
     {
         "&a/client AntiAFK [true/false or interval in seconds]",
@@ -91,5 +91,5 @@ static void AntiAfk_Task(struct ScheduledTask* task) {
 static void AntiAfk_Init(void) {
     PlayerEntity = &TempVar(struct _EntitiesData*, ENTITIES_)->CurPlayer->Base;
     GetFP(FP_ScheduledTask_Add, SCHEDULEDTASK_ADD_)(GAME_DEF_TICKS, AntiAfk_Task);
-    GetFP(FP_Commands_Register, COMMANDS_REGISTER_)(&AntiAfkCmd);
+    GetFP(FP_Commands_Register, COMMANDS_REGISTER_)(&AntiAfkCommand);
 }

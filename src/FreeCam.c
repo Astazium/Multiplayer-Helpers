@@ -43,7 +43,7 @@ const struct IGameComponent FreeCamComp = {
 
 static float g_Speed = 19.2f;
 
-static void FreeCam_Execute(const cc_string* args, int argsCount) {
+static void FreeCamCommand_Execute(const cc_string* args, int argsCount) {
     cc_bool enabled;
     if (argsCount == 0) {
         Chat_AddRaw("&eToo few arguments.");
@@ -73,8 +73,8 @@ static void FreeCam_Execute(const cc_string* args, int argsCount) {
     }
 }
 
-static struct ChatCommand FreeCamCmd = {
-    "FreeCam", FreeCam_Execute,
+static struct ChatCommand FreeCamCommand = {
+    "FreeCam", FreeCamCommand_Execute,
     COMMAND_FLAG_UNSPLIT_ARGS,
     {
         "&a/client FreeCam [true/false]",
@@ -128,7 +128,7 @@ static void FreeCam_Init(void) {
     InputEvents_   = GetGameSymbol(INPUTEVENTS_);
     Event_Register = GetFP(FP_Event_Register, EVENT_REGISTER_);
 
-    GetFP(FP_Commands_Register, COMMANDS_REGISTER_)(&FreeCamCmd);
+    GetFP(FP_Commands_Register, COMMANDS_REGISTER_)(&FreeCamCommand);
     PlayerEntity = &TempVar(struct _EntitiesData*, ENTITIES_)->CurPlayer->Base;
     Game_   = GetGameSymbol(GAME_);
 

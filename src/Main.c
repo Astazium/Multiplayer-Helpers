@@ -5,7 +5,8 @@
 DeclareComp(GameSymbolsComp)    \
 DeclareComp(AntiAfkComp)        \
 DeclareComp(ArtBuilderComp)     \
-DeclareComp(FreeCamComp)
+DeclareComp(FreeCamComp)        \
+DeclareComp(UtilsComp)
 
 #define DeclareComp(name) extern const struct IGameComponent name;
 CompsDeclList
@@ -14,7 +15,7 @@ CompsDeclList
 #define DeclareComp(name) &name,
 static const struct IGameComponent* const comps[] = {
     CompsDeclList
-    NULL
+    NULL,
 };
 #undef DeclareComp
 

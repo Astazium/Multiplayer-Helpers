@@ -215,7 +215,7 @@ static void ShowFSError(const char* contextMsg, cc_result errCode);
 /* Whether the given coordinates lie inside the map. */
 static cc_bool World_Contains_(const IVec3* pos);
 
-static void ArtBuilder_Execute(const cc_string* args, int argsCount) {
+static void ArtBuilderCommand_Execute(const cc_string* args, int argsCount) {
     FP_String_CaselessEqualsConst String_CaselessEqualsConst_;
     FP_Convert_ParseInt Convert_ParseInt_;
     FP_Chat_Add1 Chat_Add1_;
@@ -414,8 +414,8 @@ static void ArtBuilder_Execute(const cc_string* args, int argsCount) {
     Chat_AddRaw("&eUnknown parameter.");
 }
 
-static struct ChatCommand BuildImageCmd = {
-    "ArtBuilder", ArtBuilder_Execute,
+static struct ChatCommand ArtBuilderCommand = {
+    "ArtBuilder", ArtBuilderCommand_Execute,
     0,
     {
         "&a/client ArtBuilder",
@@ -575,7 +575,7 @@ static void ArtBuilder_Init(void) {
 
     GetFP(FP_Event_Register,    EVENT_REGISTER_)((struct Event_Void*)&TempVar(struct _TextureEventsList*, TEXTUREEVENTS_)->AtlasChanged, NULL, TakeAverageBlocksColor);
     GetFP(FP_ScheduledTask_Add, SCHEDULEDTASK_ADD_)(GAME_DEF_TICKS, ArtBuilder_MPBuildTask);
-    GetFP(FP_Commands_Register, COMMANDS_REGISTER_)(&BuildImageCmd);
+    GetFP(FP_Commands_Register, COMMANDS_REGISTER_)(&ArtBuilderCommand);
 }
 
 #ifdef  CC_BUILD_WIN
