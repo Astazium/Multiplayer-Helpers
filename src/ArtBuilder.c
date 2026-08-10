@@ -593,6 +593,7 @@ static void ArtBuilder_Init(void) {
 static void Chat_AddFileSystemError(const char* contextMsg, cc_result errCode) {
     cc_string errMsgStr;
     char errMsgBuffer[512];
+
     WCHAR rawErrMsgBuf[512];
     DWORD length;
 
@@ -612,11 +613,9 @@ static void Chat_AddFileSystemError(const char* contextMsg, cc_result errCode) {
 
     if (!length) {
         GetFP(FP_String_Format1, STRING_FORMAT1_)(&errMsgStr, "Error code: %i", &errCode);
-        GetFP(FP_Chat_Add, CHAT_ADD_)(&errMsgStr);
-        return;
+    } else {
+        GetFP(FP_String_AppendUtf16, STRING_APPENDUTF16_)(&errMsgStr, rawErrMsgBuf, length * sizeof(WCHAR));
     }
-
-    GetFP(FP_String_AppendUtf16, STRING_APPENDUTF16_)(&errMsgStr, rawErrMsgBuf, length * sizeof(WCHAR));
     GetFP(FP_Chat_Add, CHAT_ADD_)(&errMsgStr);
 }
 
