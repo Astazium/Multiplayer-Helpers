@@ -91,29 +91,19 @@ static cc_bool keyRight;
 static cc_bool keyUp;
 static cc_bool keyDown;
 
-static void OnKeyPressed(void* obj, int key, cc_bool repeating, struct InputDevice* device) {
+static void PressKey(int key, cc_bool isPressed) {
     switch (key) {
-    case CCKEY_UP:    keyForward = true; return;
-    case CCKEY_DOWN:  keyBack    = true; return;
-    case CCKEY_LEFT:  keyLeft    = true; return;
-    case CCKEY_RIGHT: keyRight   = true; return;
-
-    case CCKEY_KP1:   keyUp   = true; return;
-    case CCKEY_KP0:   keyDown = true; return;
+    case CCKEY_UP:    keyForward = isPressed; return;
+    case CCKEY_DOWN:  keyBack = isPressed; return;
+    case CCKEY_LEFT:  keyLeft = isPressed; return;
+    case CCKEY_RIGHT: keyRight = isPressed; return;
+    case CCKEY_KP1:   keyUp = isPressed; return;
+    case CCKEY_KP0:   keyDown = isPressed; return;
     }
 }
 
-static void OnKeyReleased(void* obj, int key, cc_bool repeating, struct InputDevice* device) {
-    switch (key) {
-    case CCKEY_UP:    keyForward = false; return;
-    case CCKEY_DOWN:  keyBack    = false; return;
-    case CCKEY_LEFT:  keyLeft    = false; return;
-    case CCKEY_RIGHT: keyRight   = false; return;
-
-    case CCKEY_KP1:   keyUp   = false; return;
-    case CCKEY_KP0:   keyDown = false; return;
-    }
-}
+static void OnKeyPressed(void* obj, int key, cc_bool repeating, struct InputDevice* device)  { PressKey(key, true); }
+static void OnKeyReleased(void* obj, int key, cc_bool repeating, struct InputDevice* device) { PressKey(key, false); }
 
 static void FreeCam_Free(void) {
     struct _InputEventsList* InputEvents_;

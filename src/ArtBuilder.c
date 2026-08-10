@@ -396,7 +396,7 @@ static void ArtBuilder_Execute(const cc_string* args, int argsCount) {
             Chat_AddRaw("&eCould not parse value.");
             return;
         }
-        if (placeInterval < 0.07f) {
+        if (placeInterval <= GAME_DEF_TICKS) {
             Chat_AddRaw("&eBlock place interval is too small.");
             return;
         }
