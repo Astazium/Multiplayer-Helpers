@@ -46,7 +46,9 @@ static void TakeAverageBlocksColor(void* obj) {
     struct _BlockLists*  Blocks_;
     struct _Atlas2DData* Atlas2D_;
     int block;
+    int validBlocks;
     (void)obj;
+    validBlocks = 0;
 
     Blocks_  = GetGameSymbol(BLOCKS_);
     Atlas2D_ = GetGameSymbol(ATLAS2D_);
@@ -93,8 +95,11 @@ static void TakeAverageBlocksColor(void* obj) {
             cc_uint8 avgB = (cc_uint8)(sumB / pixelCount);
             cc_uint8 avgA = (cc_uint8)(sumA / pixelCount);
             blocksColor[block] = BitmapCol_Make(avgR, avgG, avgB, avgA);
+            ++validBlocks;
         }
     }
+
+    GetFP(FP_Chat_Add1, CHAT_ADD1_)("&eScanned %i valid blocks.", &validBlocks);
 }
 
 static BlockID FindClosestBlock(BitmapCol col) {
