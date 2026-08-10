@@ -27,8 +27,7 @@ const struct IGameComponent ArtBuilderComp = {
     FreeImage, /* OnNewMapLoaded */
 };
 
-static BlockID   blockCount = BLOCK_MAX_CPE;
-static BitmapCol blocksColor [BLOCK_MAX_CPE];
+static BitmapCol blocksColor [BLOCK_COUNT];
 
 static cc_bool Block_IsFull(const struct _BlockLists* Blocks_, BlockID block) {
     Vec3 minBB = Blocks_->MinBB[block];
@@ -43,15 +42,16 @@ static cc_bool Block_IsFull(const struct _BlockLists* Blocks_, BlockID block) {
 
 #define Block_Tex(blockLists, block, face) blockLists->Textures[(block) * FACE_COUNT + (face)]
 
-static void TakeAverageBlocksColor(void) {
+static void TakeAverageBlocksColor(void* obj) {
     struct _BlockLists*  Blocks_;
     struct _Atlas2DData* Atlas2D_;
     int block;
+    (void)obj;
 
     Blocks_  = GetGameSymbol(BLOCKS_);
     Atlas2D_ = GetGameSymbol(ATLAS2D_);
 
-    for (block = BLOCK_STONE; block <= blockCount; ++block) {
+    for (block = 0; block < BLOCK_COUNT; ++block) {
         cc_uint64 sumR, sumG, sumB, sumA, pixelCount;
         int face;
 
@@ -106,7 +106,7 @@ static BlockID FindClosestBlock(BitmapCol col) {
     cc_uint32 bestDist = 0xFFFFFFFF;
 
     int i;
-    for (i = 0; i <= blockCount; ++i) {
+    for (i = 0; i < BLOCK_COUNT; ++i) {
         BitmapCol candidate = blocksColor[i];
         if (candidate != 0) {
             int cr = (int)BitmapCol_R(candidate);
@@ -553,17 +553,8 @@ static void ArtBuilder_MPBuildTask(struct ScheduledTask* task) {
     }
 }
 
-static void UpdateAverageBlocksColor(void* obj) {
-    cc_bool hasCPE;
-    (void)obj;
-    hasCPE = GetFP(FP_Options_GetBool, OPTIONS_GETBOOL_)(OPT_CPE, true);
-    blockCount = hasCPE ? BLOCK_MAX_CPE : BLOCK_MAX_ORIGINAL;
-    GetFP(FP_Chat_Add1, CHAT_ADD1_)("&eHas CPE: %t", &hasCPE);
-    TakeAverageBlocksColor();
-}
-
 static void ArtBuilder_Free(void) {
-    GetFP(FP_Event_Unregister, EVENT_UNREGISTER_)((struct Event_Void*)&TempVar(struct _TextureEventsList*, TEXTUREEVENTS_)->AtlasChanged, NULL, UpdateAverageBlocksColor);
+    GetFP(FP_Event_Unregister, EVENT_UNREGISTER_)((struct Event_Void*)&TempVar(struct _TextureEventsList*, TEXTUREEVENTS_)->AtlasChanged, NULL, TakeAverageBlocksColor);
     FreeImage();
 }
 
@@ -582,7 +573,7 @@ static void ArtBuilder_Init(void) {
         MPmode.enabled = false;
     }
 
-    GetFP(FP_Event_Register,    EVENT_REGISTER_)((struct Event_Void*)&TempVar(struct _TextureEventsList*, TEXTUREEVENTS_)->AtlasChanged, NULL, UpdateAverageBlocksColor);
+    GetFP(FP_Event_Register,    EVENT_REGISTER_)((struct Event_Void*)&TempVar(struct _TextureEventsList*, TEXTUREEVENTS_)->AtlasChanged, NULL, TakeAverageBlocksColor);
     GetFP(FP_ScheduledTask_Add, SCHEDULEDTASK_ADD_)(GAME_DEF_TICKS, ArtBuilder_MPBuildTask);
     GetFP(FP_Commands_Register, COMMANDS_REGISTER_)(&BuildImageCmd);
 }
