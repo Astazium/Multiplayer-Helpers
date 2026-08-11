@@ -132,7 +132,7 @@ static BlockID FindClosestBlock(BitmapCol col) {
             if (dist < bestDist) {
                 bestDist = dist;
                 bestBlock = (BlockID)i;
-                if (dist == 0) break;
+                if (dist == 0) { break; }
             }
         }
     }
@@ -195,7 +195,7 @@ static void Chat_PrintBuildingETA(void) {
     GetFP(FP_Chat_Add, CHAT_ADD_)(&msgStr);
 }
 
-static cc_bool CheckBuildCmd(void) {
+static cc_bool CheckBuildCommand(void) {
     if (!MPmode.enabled) {
         Chat_AddRaw("&eYou are not in multiplayer mode.");
         return false;
@@ -243,8 +243,9 @@ static void ArtBuilderCommand_Execute(const cc_string* args, int argsCount) {
         
         if (String_CaselessEqualsConst_(&args[1], "stop")) {
             int placedBlocks;
-            if (!CheckBuildCmd())
+            if (!CheckBuildCommand()) {
                 return;
+            }
             placedBlocks = Image.y * Image.bmp.width + Image.x;
             Chat_Add1_("&eBuild stopped, %i blocks were builded.", &placedBlocks);
             FreeImage();
@@ -252,16 +253,18 @@ static void ArtBuilderCommand_Execute(const cc_string* args, int argsCount) {
         }
 
         if (String_CaselessEqualsConst_(&args[1], "eta")) {
-            if (!CheckBuildCmd())
+            if (!CheckBuildCommand()) {
                 return;
+            }
             Chat_PrintBuildingETA();
             return;
         }
 
         if (String_CaselessEqualsConst_(&args[1], "pause")) {
             cc_bool buildPause;
-            if (!CheckBuildCmd())
+            if (!CheckBuildCommand()) {
                 return;
+            }
             if (argsCount == 2) {
                 Chat_AddRaw("&eToo few arguments.");
                 return;
@@ -335,12 +338,11 @@ static void ArtBuilderCommand_Execute(const cc_string* args, int argsCount) {
             return;
         }
         pngDecodeErr = GetFP(FP_Png_Decode, PNG_DECODE_)(&Image.bmp, &s);
+        s.Close(&s);
         if (pngDecodeErr) {
             Chat_Add1_("&eCould not decode png: %c", Png_GetErrorString(pngDecodeErr));
-            s.Close(&s);
             return;
         }
-        s.Close(&s);
         ArtBuilder_Build(&dir);
         return;
     }
@@ -411,8 +413,9 @@ static void ArtBuilderCommand_Execute(const cc_string* args, int argsCount) {
         GetFP(FP_String_AppendConst, STRING_APPENDCONST_)(&msgStr, "&eBlock place interval setted to: ");
         Time_FormatSeconds(&msgStr, placeInterval);
         GetFP(FP_Chat_Add, CHAT_ADD_)(&msgStr);
-        if (MPmode.buildRunning)
+        if (MPmode.buildRunning) {
             Chat_PrintBuildingETA();
+        }
         return;
     }
 
@@ -484,8 +487,9 @@ static void ArtBuilder_SPBuild(void) {
             BitmapCol col = row[Image.x];
             BlockID block = FindClosestBlock(col);
             GetBuildPos(&buildPos);
-            if (World_Contains_(&buildPos))
+            if (World_Contains_(&buildPos)) {
                 Game_ChangeBlock_(buildPos.x, buildPos.y, buildPos.z, block);
+            }
         }
     }
     GetFP(FP_Chat_Add1, CHAT_ADD1_)("&eSuccessfully builded %i blocks.", &totalBlocks);
@@ -494,9 +498,9 @@ static void ArtBuilder_SPBuild(void) {
 
 static void ArtBuilder_MPBuildTask(struct ScheduledTask* task) {
     BitmapCol* row;
-    if (!MPmode.enabled || !MPmode.buildRunning || MPmode.buildPaused) return;
+    if (!MPmode.enabled || !MPmode.buildRunning || MPmode.buildPaused) { return; }
     MPmode.accumulator += task->interval;
-    if (MPmode.accumulator < MPmode.placeInterval) return;
+    if (MPmode.accumulator < MPmode.placeInterval){ return; }
     MPmode.accumulator = 0.0;
 
     if (Image.y >= Image.bmp.height) {
@@ -547,8 +551,9 @@ static void ArtBuilder_MPBuildTask(struct ScheduledTask* task) {
             return;
         }
 
-        if (World_Contains_(&buildPos))
+        if (World_Contains_(&buildPos)) {
             Game_ChangeBlock_(buildPos.x, buildPos.y, buildPos.z, block);
+        }
 
         ++Image.x;
     }
@@ -612,7 +617,7 @@ static void Chat_AddFileSystemError(const char* contextMsg, cc_result errCode) {
     );
 
     if (!length) {
-        GetFP(FP_String_Format1, STRING_FORMAT1_)(&errMsgStr, "Error code: %i", &errCode);
+        GetFP(FP_String_Format1, STRING_FORMAT1_)(&errMsgStr, "File system error code: %i", &errCode);
     } else {
         GetFP(FP_String_AppendUtf16, STRING_APPENDUTF16_)(&errMsgStr, rawErrMsgBuf, length * sizeof(WCHAR));
     }

@@ -16,7 +16,7 @@ const struct IGameComponent UtilsComp = {
 };
 
 static void MaxCoordsCommand_Execute(const cc_string* args, int argsCount) {
-    static struct _WorldData* World_;
+    struct _WorldData* World_;
     World_ = GetGameSymbol(WORLD_);
     GetFP(FP_Chat_Add3, CHAT_ADD3_)("&eMax X: %i, Max Y: %i, Max Z: %i", &World_->MaxX, &World_->MaxY, &World_->MaxZ);
 }
