@@ -29,13 +29,6 @@ const struct IGameComponent ArtBuilderComp = {
 
 static BitmapCol blocksColor [BLOCK_COUNT];
 
-static cc_bool Block_IsFull(const struct _BlockLists* Blocks_, BlockID block) {
-    Vec3 minBB = Blocks_->MinBB[block];
-    Vec3 maxBB = Blocks_->MaxBB[block];
-    return minBB.x == 0.0f && minBB.y == 0.0f && minBB.z == 0.0f &&
-           maxBB.x == 1.0f && maxBB.y == 1.0f && maxBB.z == 1.0f;
-}
-
 #ifdef Block_Tex
 #undef Block_Tex
 #endif
@@ -46,9 +39,7 @@ static void TakeAverageBlocksColor(void* obj) {
     struct _BlockLists*  Blocks_;
     struct _Atlas2DData* Atlas2D_;
     int block;
-    int validBlocks;
     (void)obj;
-    validBlocks = 0;
 
     Blocks_  = GetGameSymbol(BLOCKS_);
     Atlas2D_ = GetGameSymbol(ATLAS2D_);
@@ -56,15 +47,7 @@ static void TakeAverageBlocksColor(void* obj) {
     for (block = 0; block < BLOCK_COUNT; ++block) {
         cc_uint64 sumR, sumG, sumB, sumA, pixelCount;
         int face;
-
-        if (!Blocks_->CanPlace[block] || !Blocks_->CanDelete[block] || Blocks_->IsLiquid[block] ||
-            !Block_IsFull(Blocks_, block) || block == BLOCK_TNT || block == BLOCK_GLASS)
-        {
-            continue;
-        }
-
-        sumR = sumG = sumB = sumA = pixelCount = 0;
-
+        sumR = sumG = sumB = sumA = pixelCount = 0; 
         for (face = 0; face < FACE_COUNT; ++face) {
             TextureLoc texLoc = Block_Tex(Blocks_, block, face);
             int tileSize = Atlas2D_->TileSize;
@@ -95,11 +78,15 @@ static void TakeAverageBlocksColor(void* obj) {
             cc_uint8 avgB = (cc_uint8)(sumB / pixelCount);
             cc_uint8 avgA = (cc_uint8)(sumA / pixelCount);
             blocksColor[block] = BitmapCol_Make(avgR, avgG, avgB, avgA);
-            ++validBlocks;
         }
     }
+}
 
-    GetFP(FP_Chat_Add1, CHAT_ADD1_)("&eScanned %i valid blocks.", &validBlocks);
+static cc_bool Block_IsFull(const struct _BlockLists* Blocks_, BlockID block) {
+    Vec3 minBB = Blocks_->MinBB[block];
+    Vec3 maxBB = Blocks_->MaxBB[block];
+    return minBB.x == 0.0f && minBB.y == 0.0f && minBB.z == 0.0f &&
+        maxBB.x == 1.0f && maxBB.y == 1.0f && maxBB.z == 1.0f;
 }
 
 static BlockID FindClosestBlock(BitmapCol col) {
@@ -110,9 +97,17 @@ static BlockID FindClosestBlock(BitmapCol col) {
     BlockID   bestBlock = 0;
     cc_uint32 bestDist = 0xFFFFFFFF;
 
-    int i;
-    for (i = 0; i < BLOCK_COUNT; ++i) {
-        BitmapCol candidate = blocksColor[i];
+    struct _BlockLists* Blocks_;
+    Blocks_ = GetGameSymbol(BLOCKS_);
+
+    int block;
+    for (block = 0; block < BLOCK_COUNT; ++block) {
+        if (!Blocks_->CanPlace[block] || !Blocks_->CanDelete[block] || Blocks_->IsLiquid[block] ||
+            !Block_IsFull(Blocks_, block) || block == BLOCK_TNT || block == BLOCK_GLASS || block == BLOCK_AIR)
+        {
+            continue;
+        }
+        BitmapCol candidate = blocksColor[block];
         if (candidate != 0) {
             int cr = (int)BitmapCol_R(candidate);
             int cg = (int)BitmapCol_G(candidate);
@@ -131,7 +126,7 @@ static BlockID FindClosestBlock(BitmapCol col) {
 
             if (dist < bestDist) {
                 bestDist = dist;
-                bestBlock = (BlockID)i;
+                bestBlock = (BlockID)block;
                 if (dist == 0) { break; }
             }
         }
