@@ -27,17 +27,17 @@ RawSymbol GetGameRawSymbol(enum GAMESYMBOL gameSymbol)
 }
 
 #define QUOTE(x) #x
-#ifdef  CC_BUILD_WIN
-#define WIN32_LEAN_AND_MEAN
-#define NOSERVICE
-#define NOMCX
-#define NOIME
-#include <windows.h>
-#define DeclareSymbol(enumName, symbolName) gameSymbols[enumName].rawSymbol = (RawSymbol)GetProcAddress(GetModuleHandleA(NULL), QUOTE(symbolName));
-#else
-#define _GNU_SOURCE
-#include <dlfcn.h>
-#define DeclareSymbol(enumName, symbolName) gameSymbols[enumName].symbol = dlsym(RTLD_DEFAULT, QUOTE(symbolName));
+#ifdef CC_BUILD_WIN
+	#define WIN32_LEAN_AND_MEAN
+	#define NOSERVICE
+	#define NOMCX
+	#define NOIME
+	#include <windows.h>
+	#define DeclareSymbol(enumName, symbolName) gameSymbols[enumName].rawSymbol = (RawSymbol)GetProcAddress(GetModuleHandleA(NULL), QUOTE(symbolName));
+#elif CC_BUILD_POSIX
+	#define _GNU_SOURCE
+	#include <dlfcn.h>
+	#define DeclareSymbol(enumName, symbolName) gameSymbols[enumName].symbol = dlsym(RTLD_DEFAULT, QUOTE(symbolName));
 #endif
 
 static void LoadSymbolsFromGame(void) {

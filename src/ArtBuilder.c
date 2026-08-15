@@ -619,7 +619,7 @@ static void Chat_AddFileSystemError(const char* contextMsg, cc_result errCode) {
     GetFP(FP_Chat_Add, CHAT_ADD_)(&errMsgStr);
 }
 
-#else
+#elif CC_BUILD_POSIX
 #define _GNU_SOURCE
 
 static void Chat_AddFileSystemError(const char* contextMsg, cc_result errCode) {
